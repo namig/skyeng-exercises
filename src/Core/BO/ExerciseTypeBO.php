@@ -9,6 +9,7 @@
 namespace App\Core\BO;
 
 
+use App\Core\Business\ExercisePersistenceBusiness\APassedExercisePersistenceBusiness;
 use App\Core\Business\ScoringStrategy\ScoringStrategyInterface;
 use App\Core\Persistence\ExercisePersistence\PassedExercisePersistenceInterface;
 
@@ -23,16 +24,16 @@ class ExerciseTypeBO extends ABo
 	 * @var ScoringStrategyInterface
 	 */
 	private $scoringStrategy;
-
 	/**
-	 * @var PassedExercisePersistenceInterface
+	 * @var APassedExercisePersistenceBusiness
 	 */
-	private $passedExercisePersistence;
+	private $passedExercisePersistenceBusiness;
 
-	function __construct(string $code, ScoringStrategyInterface $scoringStrategy)
+	function __construct(string $code, ScoringStrategyInterface $scoringStrategy, APassedExercisePersistenceBusiness $passedExercisePersistenceBusiness)
 	{
 		$this->code = $code;
 		$this->scoringStrategy = $scoringStrategy;
+		$this->passedExercisePersistenceBusiness = $passedExercisePersistenceBusiness;
 	}
 
 	/**
@@ -66,4 +67,21 @@ class ExerciseTypeBO extends ABo
 	{
 		$this->scoringStrategy = $scoringStrategy;
 	}
+
+	/**
+	 * @return APassedExercisePersistenceBusiness
+	 */
+	public function getPassedExercisePersistenceBusiness(): ?APassedExercisePersistenceBusiness
+	{
+		return $this->passedExercisePersistenceBusiness;
+	}
+
+	/**
+	 * @param APassedExercisePersistenceBusiness $passedExercisePersistenceBusiness
+	 */
+	public function setPassedExercisePersistenceBusiness(?APassedExercisePersistenceBusiness $passedExercisePersistenceBusiness)
+	{
+		$this->passedExercisePersistenceBusiness = $passedExercisePersistenceBusiness;
+	}
+
 }

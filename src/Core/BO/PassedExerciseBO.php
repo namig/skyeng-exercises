@@ -9,6 +9,7 @@
 namespace App\Core\BO;
 
 
+use App\Core\BO\Exercise\AExerciseBO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -23,11 +24,6 @@ class PassedExerciseBO extends ABo
 	 * @var Collection | AnswerBO[]
 	 */
 	private $answers;
-
-	/**
-	 * @var AnswerBO
-	 */
-	private $lastAnswer;
 
 	/**
 	 * @var UserBO
@@ -76,15 +72,7 @@ class PassedExerciseBO extends ABo
 	 */
 	public function getLastAnswer(): ?AnswerBO
 	{
-		return $this->lastAnswer;
-	}
-
-	/**
-	 * @param AnswerBO $lastAnswer
-	 */
-	public function setLastAnswer(?AnswerBO $lastAnswer)
-	{
-		$this->lastAnswer = $lastAnswer;
+		return $this->answers->last();
 	}
 
 	/**
@@ -103,11 +91,17 @@ class PassedExerciseBO extends ABo
 		$this->user = $user;
 	}
 
+	/**
+	 * @param AnswerBO $answerBO
+	 */
 	public function addAnswer(AnswerBO $answerBO)
 	{
 		$this->answers->add($answerBO);
 	}
 
+	/**
+	 * @return \App\Core\Business\ScoringStrategy\ScoringStrategyInterface|null
+	 */
 	public function getScoringStrategy()
 	{
 		return $this->getExercise()->getExerciseType()->getScoringStrategy();

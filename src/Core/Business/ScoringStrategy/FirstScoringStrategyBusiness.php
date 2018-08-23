@@ -11,12 +11,17 @@ namespace App\Core\Business\ScoringStrategy;
 
 use App\Core\BO\PassedExerciseBO;
 
+/**
+ * TASK: 10 баллов, если последний ответ верный. 0 баллов, если неверный.
+ */
 class FirstScoringStrategyBusiness implements ScoringStrategyInterface
 {
 	public function calculateScore(PassedExerciseBO $passedExercise): int
 	{
-		// fake
-		return 5;
+		$lastAnswer = $passedExercise->getLastAnswer();
+		$exercise = $passedExercise->getExercise();
+
+		return $exercise->checkAnswer($lastAnswer) ? 10 : 0;
 	}
 
 }

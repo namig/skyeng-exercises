@@ -17,11 +17,41 @@ use App\Core\BO\ExerciseTypeBO;
 use App\Core\BO\PassedExerciseBO;
 use App\Core\Business\ExerciseCreator\InputExerciseCreatorBusiness;
 use App\Core\Business\ExerciseCreator\SelectExerciseCreatorBusiness;
+use App\Core\Business\ExercisePersistenceBusiness\MySqlPassedExercisePersistenceBusiness;
+use App\Core\Business\ExercisePersistenceBusiness\RedisPassedExercisePersistenceBusiness;
 use App\Core\Business\ScoringStrategy\FirstScoringStrategyBusiness;
 use App\Core\Business\ScoringStrategy\SecondScoringStrategyBusiness;
 
 class TestConsole
 {
+	/**
+	 * @var FirstScoringStrategyBusiness
+	 */
+	private $firstScoringStrategyBusiness;
+	/**
+	 * @var SecondScoringStrategyBusiness
+	 */
+	private $secondScoringStrategyBusiness;
+	/**
+	 * @var RedisPassedExercisePersistenceBusiness
+	 */
+	private $redisPassedExercisePersistenceBusiness;
+	/**
+	 * @var MySqlPassedExercisePersistenceBusiness
+	 */
+	private $mySqlPassedExercisePersistenceBusiness;
+
+	function __construct(FirstScoringStrategyBusiness $firstScoringStrategyBusiness,
+	                     SecondScoringStrategyBusiness $secondScoringStrategyBusiness,
+	                     RedisPassedExercisePersistenceBusiness $redisPassedExercisePersistenceBusiness,
+	                     MySqlPassedExercisePersistenceBusiness $mySqlPassedExercisePersistenceBusiness)
+	{
+		$this->firstScoringStrategyBusiness = $firstScoringStrategyBusiness;
+		$this->secondScoringStrategyBusiness = $secondScoringStrategyBusiness;
+		$this->redisPassedExercisePersistenceBusiness = $redisPassedExercisePersistenceBusiness;
+		$this->mySqlPassedExercisePersistenceBusiness = $mySqlPassedExercisePersistenceBusiness;
+	}
+
 	public function test()
 	{
 		$score = 0;
@@ -39,9 +69,12 @@ class TestConsole
 		$answer2 = new AnswerBO('2018');
 
 		$passedExercise = new PassedExerciseBO();
+		$passedExercise->setExercise($exercise);
 		$passedExercise->addAnswer($answer1);
 		$passedExercise->addAnswer($answer2);
 
+		$persistence = $exercise->getPassedExercisePersistenceBusiness();
+		$persistence->save($passedExercise);
 		$scoringStrategy = $exercise->getScoringStrategy();
 
 		return $scoringStrategy->calculateScore($passedExercise);
@@ -56,11 +89,16 @@ class TestConsole
 			'Все'
 		]);
 
-		$answer1 = new AnswerBO('Все');
+		$answer1 = new AnswerBO('Саратов');
+		$answer2 = new AnswerBO('Все');
 
 		$passedExercise = new PassedExerciseBO();
+		$passedExercise->setExercise($exercise);
 		$passedExercise->addAnswer($answer1);
+		$passedExercise->addAnswer($answer2);
 
+		$persistence = $exercise->getPassedExercisePersistenceBusiness();
+		$persistence->save($passedExercise);
 		$scoringStrategy = $exercise->getScoringStrategy();
 
 		return $scoringStrategy->calculateScore($passedExercise);
@@ -69,8 +107,9 @@ class TestConsole
 
 	private function createInputExercise(string $question, string $rightAnswer)
 	{
-		$scoringStrategy = new FirstScoringStrategyBusiness();
-		$exerciseType = new ExerciseTypeBO(ExerciseTypeEnum::INPUT, $scoringStrategy);
+		$exerciseType = new ExerciseTypeBO(ExerciseTypeEnum::INPUT,
+			$this->firstScoringStrategyBusiness,
+			$this->mySqlPassedExercisePersistenceBusiness);
 		$creator = new InputExerciseCreatorBusiness($exerciseType);
 
 		$config = new InputExerciseConfigBO();
@@ -83,8 +122,10 @@ class TestConsole
 
 	private function createSelectExercise(string $question, string $rightAnswer, array $options)
 	{
-		$scoringStrategy = new SecondScoringStrategyBusiness();
-		$exerciseType = new ExerciseTypeBO(ExerciseTypeEnum::SELECT, $scoringStrategy);
+		$exerciseType = new ExerciseTypeBO(ExerciseTypeEnum::SELECT,
+			$this->secondScoringStrategyBusiness,
+			$this->redisPassedExercisePersistenceBusiness);
+
 		$creator = new SelectExerciseCreatorBusiness($exerciseType);
 
 		$config = new SelectExerciseConfigBO();

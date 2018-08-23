@@ -20,7 +20,7 @@ class SelectExerciseBO extends AExerciseBO
 
 	function checkAnswer(AnswerBO $userAnswer): bool
 	{
-		foreach ($this->$this->options as $value) {
+		foreach ($this->options as $value) {
 			if ($value == $userAnswer->getValue()) {
 				return true;
 			}

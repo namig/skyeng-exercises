@@ -11,6 +11,7 @@ namespace App\Core\BO\Exercise;
 use App\Core\BO\ABo;
 use App\Core\BO\AnswerBO;
 use App\Core\BO\ExerciseTypeBO;
+use App\Core\Business\ExercisePersistenceBusiness\APassedExercisePersistenceBusiness;
 use App\Core\Business\ScoringStrategy\ScoringStrategyInterface;
 
 abstract class AExerciseBO extends ABo
@@ -86,5 +87,10 @@ abstract class AExerciseBO extends ABo
 	public function getScoringStrategy() : ScoringStrategyInterface
 	{
 		return $this->getExerciseType()->getScoringStrategy();
+	}
+
+	public function getPassedExercisePersistenceBusiness() : APassedExercisePersistenceBusiness
+	{
+		return $this->getExerciseType()->getPassedExercisePersistenceBusiness();
 	}
 }
